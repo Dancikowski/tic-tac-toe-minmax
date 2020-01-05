@@ -2,25 +2,25 @@
 #  ProjectNo2 for Combinatorial Algorithms Class
 #
 #  Created by Damian Lasecki on 5/01/2020.
-
-# //////////////////////////////////////////////////////
+#
+#
 # Prerequisites
 # An initial borad is represented by nested arrays [[0,0,0],[0,0,0],[0,0,0]]
 
-PLAYER = 'X'
-COMPUTER = 'O'
+PLAYER = -1
+COMPUTER = 1
 
 board = [
-    ['O',0,0],
+    [0,0,0],
     [0,0,0],
     [0,0,0]
     ]
 
-def score(state, depth):
+def getScore(state, depth):
     if wins(state, PLAYER):
-        return 10 - depth
+        return -1
     elif wins(state, COMPUTER):
-        return depth - 10
+        return 1
     else:
         return 0
 
@@ -54,11 +54,13 @@ def getAvailableMoves(state):
         for y, cell in enumerate(row):
             if state[x][y] == 0:
                 availableCells.append([x, y])
+    
     return availableCells
 
 
-def isMoveValid(move):
-    if move in emptyCells:
+def isMoveValid(move, state):
+    availableCells = getAvailableMoves(state)
+    if move in availableCells:
         return True
     else:
         return False
@@ -66,24 +68,37 @@ def isMoveValid(move):
 def getNewStateAfterMove(x,y, state, player):
     _state = state
 
-    if isMoveValid([x,y]):
+    if isMoveValid([x,y], state):
         _state[x][y] = player
         return _state
     return _state
 
+def miniMax(state, depth, player):
+    if player == COMPUTER:
+        best = [None, None, -float("inf")]
+    else: 
+        best = [None, None, float("inf")]
 
-def miniMax(state, depth):
-    if isGameOver(state):
-        return score(state, depth)
+    if depth == 0 or isGameOver(state):
+      
+        score = getScore(state, depth)
+        return [None, None, score]
 
-    depth += 1
-    scores = []
-    moves = []
+    for x,y in getAvailableMoves(state):
+        state[x][y] = player
+        score = miniMax(state, depth - 1, -player)
+        state[x][y] = 0
+        score[0], score[1] = x, y
+        if player == COMPUTER:
+            if score[2] > best[2]:
+                best = score
+        else:
+            if score[2] < best[2]:
+                best = score
 
-    for x, y in getAvailableMoves(state):
-        stateAfterAvailableMove = getNewStateAfterMove(x, y, state, PLAYER)
-        scores.append(miniMax(stateAfterAvailableMove, depth))
-        moves.append([x,y])
+    return best
 
+depth = len(getAvailableMoves(board))
 
-miniMax(board, 0)
+result = miniMax(board, depth, COMPUTER)
+print result
