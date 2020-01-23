@@ -51,10 +51,8 @@ def getAvailableMoves(state):
     for x, row in enumerate(state):
         for y, cell in enumerate(row):
             if state[x][y] == 0:
-                availableCells.append([x, y])
-    
+                availableCells.append([x, y])    
     return availableCells
-
 
 def isMoveValid(move, state):
     availableCells = getAvailableMoves(state)
@@ -101,7 +99,7 @@ def miniMax(state, depth, player):
                 best = score
     return best
 
-def render(state, human_sign, computer_sign):
+def renderBoard(state, human_sign, computer_sign):
     chars = {
         1: computer_sign,
         -1: human_sign,
@@ -113,8 +111,7 @@ def render(state, human_sign, computer_sign):
         for k in range(len(state[i])):
             sign = state[i][k]
             if sign == -1 or sign == 1:
-                symbol = chars[sign]
-                
+                symbol = chars[sign]             
             else:
                 symbol = str(i *3 + k + 1)
             print(f'| {symbol} |', end='')
@@ -141,7 +138,7 @@ def humanMove(human_sign, computer_sign):
         }
 
     availableMoves = getAvailableMoves(board)
-    render(board, human_sign, computer_sign)
+    renderBoard(board, human_sign, computer_sign)
     
     while move < 1 or move > 9:
         try:
@@ -161,7 +158,6 @@ def main():
 
     human_sign = ""
     computer_sign = ""
-    first = ""
 
     while human_sign != "O" and human_sign != "X":
         
@@ -170,9 +166,6 @@ def main():
             print("Bad choice. Please choose X or O: ")
         else:
             print("You've chosen ", human_sign)
-
-    # let human start        
-    first = human_sign
 
     # set computer sign
     if human_sign == "O":
@@ -183,20 +176,20 @@ def main():
     depth = len(getAvailableMoves(board))
     
     while depth and not isGameOver(board):
-        humanMove(human_sign, computer_sign)
         computerMove(human_sign, computer_sign)
+        humanMove(human_sign, computer_sign)
         depth = len(getAvailableMoves(board))
 
     if wins(board, PLAYER):
         print("You won!")
-        render(board, human_sign, computer_sign)
+        renderBoard(board, human_sign, computer_sign)
         return
     if wins(board, COMPUTER):
         print("You lost!")
-        render(board, human_sign, computer_sign)
+        renderBoard(board, human_sign, computer_sign)
     else:
         print("It's draw!")
-        render(board, human_sign, computer_sign)
+        renderBoard(board, human_sign, computer_sign)
         return
     exit()
 
